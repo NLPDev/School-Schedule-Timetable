@@ -1,0 +1,79 @@
+I don't understand all of what you describe for the algorithm but here are a few comments:
+
+ 
+
+A student will typically take 8 credits (courses) in grades 9 and 10, 7 credits in 11 and 12 for a total of 30 credits to earn there diploma.
+
+ 
+
+There are Compulsory courses that a student must take with ability for them to select some electives.  Courses are selected in the spring for the upcoming school year (not by semester).
+
+ 
+
+The logic as to the courses they must take is complex but here is an example for English:
+
+ 
+
+In each grade they MUST take at least 1 English course, then as they progress and focus their area of interest they can take more electives.
+
+ 
+
+The courses in 9 and 10 are available as D=Academic, P=Applied and L=Locally developed, these align with Grade 11 and 12 U = University (Academic), C = College (Applied) and E = Workplace (Locally Developed).    Typically a student depending on their aptitude will stay in the same course level for all years but if English is too hard for them they may drop down from Academic to College level courses if they are not planning on going to University.
+
+ 
+
+From compulsory group they can only take one course each year (max 1 credit) but they for electives can choose other courses.   We don’t have to determine those courses and we will eventually receive a file with the students “choices” which is used to create the schedule.    For electives they can select ‘alternatives’ in the event the course they ask for is not available but all compulsory courses must be offered.
+
+ 
+
+ 
+
+Mathematics requires 3 credits, which means that they don’t have to take a grade 12 course.   Codings are the same (5th character) for D, P, L, U, C, E, except there is an M now added which means a Mixed level course that can be taken by either University or College students.   Eventually I will get you a table of the course codes and descriptions, and their meanings (there are hundreds of them).
+
+ 
+
+ 
+
+Examples of other courses (with number of credits shown at top).   Note: that Career Studies and Civics are 0.5 credit courses so one is offered in the first half of the semester and the other in the second half as pairs so for scheduling they can be considered a “linked” course.
+
+ 
+
+ 
+
+The above totals 15 credits but they need 30 credits to graduate – so from the table below they need 15 additional courses as electives.   The schools will make decisions on how to allocate the credits to each “Group” as some courses FSL (French as Second Language) can be applied to any of the groupings.
+
+ 
+
+ 
+
+ 
+
+Other comments for below:
+
+ 
+
+Course progress/completion percentage is not a consideration.   The scheduling just needs to determine of the courses that a student selects whether they are scheduled in semester 1 or 2, to help balance workload.   A teacher will teach 3 classes (can be multiple course sections scheduled at the same time) maximium per day. 
+
+ 
+
+Course grades is really only 4 :  9, 10, 11, 12.   The letters have different meanings but can translate back to the main ones.
+
+ 
+
+Terms usually represent ½ semester, so there should be 4 Terms.   S1 – T1, S1 – T2, S2 – T3, S2 – T4
+
+ 
+
+The basic logic of the algorithm should be based on the student course requests – read the book that I reference in earlier email that generates a course conflict matrix and looks at the number of sections that will be offered – for electives where only one section is being offered (singleton) those are the ones that need to be placed into the schedule first to avoid conflicts (if student selects 2 single section courses they can’t be in two different places/rooms at the same time).
+
+ 
+
+There is a certain amount of human reasoning that can be used to constrain the model.
+
+ 
+
+But for now let’s not get too far into the algorithm – focus on the matrix reports as that will give us a better insight into the relationships and groupings of courses that students take.
+
+ 
+
+ 
