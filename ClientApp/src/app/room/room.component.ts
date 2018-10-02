@@ -5,18 +5,21 @@ import {
   NgForm,
   Validators
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatPaginator, MatTableDataSource } from '@angular/material';
 import { Angular5Csv } from 'angular5-csv/Angular5-csv';
 import { environment as env } from '@env/environment';
-import { ROUTE_ANIMATIONS_ELEMENTS } from '@app/core';
+import { ROUTE_ANIMATIONS_ELEMENTS, routeAnimations } from '@app/core';
 
 import { AppSettings } from '../global/global';
 import { ExcelService } from '../global/excelService';
 
+
 @Component({
   selector: 'anms-room',
   templateUrl: './room.component.html',
-  styleUrls: ['./room.component.scss']
+  styleUrls: ['./room.component.scss'],
+  animations: [routeAnimations]
 })
 export class RoomComponent implements OnInit {
   routeAnimationsElements = ROUTE_ANIMATIONS_ELEMENTS;
@@ -44,10 +47,17 @@ export class RoomComponent implements OnInit {
   gridCSS: string;
   chk: boolean;
   sp_color: boolean;
+  sh_cou: boolean;
 
   selectTeacher: number;
   selectSemester: number;
   selectRoom: number;
+
+  page: number;
+  studentDetail: any;
+  objectKey: any;
+
+  constructor(private router: Router) { }
 
   ngOnInit() {
     this.init();
@@ -64,6 +74,10 @@ export class RoomComponent implements OnInit {
 
     this.chk=true;
     this.sp_color=true;
+    this.sh_cou=false;
+
+    this.page = 0;
+    this.objectKey = Object.keys;
   }
   initFromGlobalData() {
     let scheduleData = AppSettings.getScheduleData();
@@ -85,6 +99,7 @@ export class RoomComponent implements OnInit {
     this.roomObj = [];
     this.maxColumn = 0;
     this.totalAnalysis = 0;
+    this.studentDetail = {};
 
     if (scheduleData && scheduleData.length > 0) {
       for (let i = 0; i < scheduleData.length; i++) {
@@ -176,12 +191,11 @@ export class RoomComponent implements OnInit {
           '|||' +
           eObj['period'].toString();
         if (!tempData[key]) tempData[key] = [];
-        else
-          tempData[key].push({
-            course_section: eObj['course_section'].substring(0, 5),
-            student_number: eObj['student_number'],
-            teacher_name: eObj['teacher_name']
-          });
+        tempData[key].push({
+          course_section: eObj['course_section'],
+          student_number: eObj['student_number'],
+          teacher_name: eObj['teacher_name']
+        });
       }
     }
     this.roomObj[0] = [];
@@ -226,7 +240,7 @@ export class RoomComponent implements OnInit {
         if (arr && arr.length > 0) {
           let sn = [],
             names = arr[0]['teacher_name'].split(' ');
-          let firstLine = '', secondLine = '';
+          let firstLine = '', secondLine = '', thirdLine = ''; //second line is teacher name
           if (names.length > 1)
             secondLine = names[0] + ' ' + names[1].substring(0, 1).toUpperCase() + '.';
 
@@ -234,6 +248,11 @@ export class RoomComponent implements OnInit {
             this.sp_color=false;
           else
             this.sp_color=true;
+
+
+          thirdLine=arr[0]['course_section'].substring(0, 5);
+
+
           if (
             arr[0]['course_section'].indexOf('GLC') > -1 ||
             arr[0]['course_section'].indexOf('CHV') > -1
@@ -250,14 +269,27 @@ export class RoomComponent implements OnInit {
               .forEach(function(key) {
                 ordered[key] = cs[key];
               });
+
+            let numSection=0;
             for (let each in ordered) {
               firstLine += each + ' ' + ordered[each].toString() + '<br/>';
+              numSection++;
             }
 
-            if (this.sp_color==true)
-              obj[j] = [firstLine + secondLine, this.getColor(arr.length), arr.length];
-            else
-              obj[j] = [firstLine + secondLine, "#FFFFFF", arr.length];
+            if(this.sh_cou==true){
+              if (this.sp_color==true)
+                obj[j] = [firstLine + secondLine+'<br/>' + thirdLine+" "+numSection.toString()+"/"+arr.length.toString(), this.getColor(arr.length), arr.length];
+              else
+                obj[j] = [firstLine + secondLine +'<br/>'+ thirdLine+" "+numSection.toString()+"/"+arr.length.toString(), "#FFFFFF", arr.length];  
+            }
+            else {
+              if (this.sp_color==true)
+                obj[j] = [firstLine + secondLine, this.getColor(arr.length), arr.length];
+              else
+                obj[j] = [firstLine + secondLine, "#FFFFFF", arr.length];
+            }
+
+            
           } else {
             for (let k = 0; k < arr.length; k++) {
               if (sn.indexOf(arr[k]['student_number']) === -1)
@@ -265,16 +297,26 @@ export class RoomComponent implements OnInit {
             }
             firstLine = arr[0]['course_section'] + ' ' + sn.length.toString();
 
-            if (this.sp_color==true)
-              obj[j] = [firstLine + '<br/>' + secondLine, this.getColor(sn.length), arr.length];
-            else
-              obj[j] = [firstLine + '<br/>' + secondLine, "#FFFFFF", arr.length];
+            if(this.sh_cou==true){
+              if (this.sp_color==true)
+                obj[j] = [firstLine + '<br/>' + secondLine+ '<br/>' + thirdLine+" 1/"+arr.length.toString(), this.getColor(sn.length), arr.length];
+              else
+                obj[j] = [firstLine + '<br/>' + secondLine+ '<br/>' + thirdLine+" 1/"+arr.length.toString(), "#FFFFFF", arr.length];  
+            }else{
+              if (this.sp_color==true)
+                obj[j] = [firstLine + '<br/>' + secondLine, this.getColor(sn.length), arr.length];
+              else
+                obj[j] = [firstLine + '<br/>' + secondLine, "#FFFFFF", arr.length];
+            }
+
+            
           }
         }
         if (!obj[j] || obj[j].length === 0) {
           obj[j] = ["", this.getColor(0), 0];
           emptyCount++;
         }
+        obj[j].push(arr);
       }
       if (emptyCount == this.maxColumn - 1) {
         this.roomObj.splice(i, 1);
@@ -298,14 +340,14 @@ export class RoomComponent implements OnInit {
         key = this.roomObj[0][j][0];
         let rr = this.roomObj[i][j][0].split(search).join(replacement);
 
-        let sp=rr.split(' ');
+        let sp=rr.split(' '), sp_len;
+        sp_len = sp.length;
         if (j==0){
           obj[key]=rr;
         }
         if (j > 0){
 
-
-          key1 = key + " Seciton";
+          key1 = key + " Section";
           if (this.roomObj[i][j][2] === 0)
             obj[key1] = "";
           else
@@ -321,7 +363,7 @@ export class RoomComponent implements OnInit {
           if (this.roomObj[i][j][2] === 0)
             obj[key1] = "";
           else
-            obj[key1] = sp[2]+" "+sp[3];
+            obj[key1] = sp[sp_len-2]+" "+sp[sp_len-1];
         }
       }
       data.push(obj);
@@ -353,6 +395,53 @@ export class RoomComponent implements OnInit {
     if (this.totalAnalysis==0) return;
     this.chk=!this.chk;
     this.updateContent();
+  }
+
+  showCourse($event){
+    if (this.totalAnalysis==0) return;
+    this.sh_cou=!this.sh_cou;
+    this.updateContent();
+  }
+  pageTransit(p) {
+    this.page = p;
+  }
+  showDetail(i,j) {
+    if (i != 0 && j != 0)
+    {
+      let param = "";
+      let val = this.roomObj[i][j][0].split("<br/>");
+      for (let i=0;i<val.length-1;i++) {
+        let eachLine = val[i].split(" ");
+        param += eachLine[0] + ",";
+      }
+      param = param.substring(0, param.length-1);
+
+      let goUrl="/student?section=";
+      goUrl+=param;
+
+      this.router.navigateByUrl(goUrl);
+      // let cc = 0;
+      // this.studentDetail = {};
+      // this.studentDetail["Room"] = this.roomObj[i][0][0];
+      // this.studentDetail["SP"] = this.roomObj[0][j][0];
+      // this.studentDetail["Student"] = {};
+      // for(let each in this.roomObj[i][j][3]) {
+      //   let obj = this.roomObj[i][j][3][each];
+      //   if (this.studentDetail["Student"][ obj['course_section'] ] == undefined)
+      //     this.studentDetail["Student"][ obj['course_section'] ] = [];
+      //   this.studentDetail["Student"][ obj['course_section'] ].push([obj['student_number'], obj['teacher_name']]);
+      // }
+      // for (let each in this.studentDetail["Student"]) {
+      //   cc ++;
+      //   this.studentDetail[each] = this.studentDetail["Student"][each].length;
+      // }
+      // this.studentDetail["CourseCount"] = cc;
+      // this.page = 1;
+    }
+    else
+    {
+      console.log("No Data");
+    }
   }
 }
 

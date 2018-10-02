@@ -12,6 +12,7 @@ import { ClassComponent } from './class/class.component';
 import { StudentComponent } from './student/student.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { SettingsContainerComponent } from './settings';
+import { RoomeditComponent } from './roomedit/roomedit.component';
 
 const routes: Routes = [
   {
@@ -74,6 +75,11 @@ const routes: Routes = [
     component: SettingsContainerComponent,
     data: { title: 'anms.menu.settings' }
   },
+  {
+   path: 'roomedit',
+   component: RoomeditComponent,
+   data: { title: 'anms.menu.roomedit' }
+ },
   {
     path: '**',
     redirectTo: 'school'
